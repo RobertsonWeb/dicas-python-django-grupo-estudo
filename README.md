@@ -29,7 +29,7 @@ sudo apt-get install git
 ```
 
 ## Criação de um projeto exemplo:
-> Passo a passo com principais atividades necessárias para iniciar um projeto.
+> Passo a passo com principais atividades necessárias para iniciar um projeto. Consulte a documentação oficial do Django para mais detalhes https://www.djangoproject.com/start/
 
 > ***Objetivo:*** Projeto Django rodando localmente, versionado com Git e distribuído na plataforma Github
 
