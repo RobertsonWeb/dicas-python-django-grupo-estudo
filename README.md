@@ -169,3 +169,69 @@ python manage.py runserver
 
 http://localhost:8000
 ```
+## Dicas - Trabalhando com Querysets
+> ***Mais detalhes na documentação oficial do Django:*** https://docs.djangoproject.com/en/1.11/ref/models/querysets/
+
+```shell
+#Levar em consideração os seguintes modelos:
+
+class Entrega(models.Model):
+    mercadoria = models.CharField('Mercadoria', max_length=70)
+    endereco_cliente = models.CharField(u'Endereço', max_length=100)
+    data_cadastro = models.DateTimeField('Dt. cadastro',  auto_now_add=True)
+    
+    def __unicode__(self):
+        return self.mercadoria
+        
+
+class Rastreamento(models.Model):
+    entrega = models.ForeignKey(Entrega)
+    data = models.DateTimeField('data cadastro', auto_now_add=True)
+    local = models.CharField('local', max_length=20)
+    ocorrencia = models.CharField(u'ocorrência', max_length=100)
+    origem = models.CharField('origem', max_length=20)
+    destino = models.CharField('destino', max_length=20)
+
+    def __unicode__(self):
+        return 'o: %s  d: %s' % (self.origem, self.destino)
+        
+#Buscar todas entregas cujo mercadoria contenha a string 'bola':
+Entrega.objects.filter(mercadoria__icontains='bola')
+
+#Buscar todas entregas de um determinado período:
+Entrega.objects.filter(data__range=(data1, data2))
+#Onde data1 e data2 são objetos do tipo Date ou DateTime
+
+#Buscar todas entregas de um determinado período, exceto a que a mercadoria contenha a string 'bola':
+Entrega.objects.filter(data__range=(data1, data2)).exclude(mercadoria__icontains='bola')
+#Onde data1 e data2 são objetos do tipo Date ou DateTime
+
+#Contar quantas entregas ocorreram no período:
+Entrega.objects.filter(data__range=(data1, data2)).count()
+#Retorna um inteiro
+
+#Ordenar pela data da entrega:
+Entrega.objects.all().order_by('data') #ordem ascendente
+Entrega.objects.all().order_by('-data') #ordem descendente
+
+#Retornar o primeiro ou o último objeto da queryset:
+Entrega.objects.all().first()
+Entrega.objects.all().last()
+
+#Todos os rastreamentos de uma determinada entrega:
+Rastreamento.objects.filter(entrega=obj_entrega)
+#Onde obj_entrega é um objeto da classe Entrega
+
+#Buscar um objeto pela chave primária 10
+Rastreamento.objects.get(id=10)
+Rastreamento.objects.get(pk=10)
+#Retorna um objeto da classe Rastreamento
+
+#Todos os rastreamentos onde a origem foi Santa Maria e que a mercadoria contenha a string 'bola':
+Rastreamento.objects.filter(origem__contains='Santa Maria', entrega__mercadoria__icontains='bola')
+
+#Buscar todos rastreamentos que passaram por cidades onde o nome inicia com a palavra “Santa”
+from django.db.models import Q
+Rastreamento.objects.filter(Q(origem__startwith = 'Santa') | Q(destino__startwith = 'Santa'))
+#Retorna um objeto da classe Rastreamento
+```
